@@ -632,20 +632,22 @@ function App() {
           {/* Header */}
           <header className="bg-white shadow-md border-b-2 border-[#0070AD] sticky top-0 z-40">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-center items-center py-6 relative">
-                <button
-                  onClick={handleBackToOverview}
-                  className="text-[#0070AD] hover:text-[#005A8C] flex items-center font-semibold transition-colors duration-300 hover:scale-105 flex-shrink-0 absolute left-0"
-                  title="Back to Overview (Esc)"
-                >
-                  <span className="text-xl mr-2">←</span> Back
-                </button>
-                <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent flex items-center justify-center">
-                  <CapgeminiLogo className="mr-3 flex-shrink-0" width="32" height="30" />
-                  <span className="truncate">{selectedModule.title}</span>
+              <div className="flex justify-between items-center py-6">
+                <div className="flex items-center flex-1 min-w-0">
+                  <button
+                    onClick={handleBackToOverview}
+                    className="text-[#0070AD] hover:text-[#005A8C] mr-6 flex items-center font-semibold transition-colors duration-300 hover:scale-105 flex-shrink-0"
+                    title="Back to Overview (Esc)"
+                  >
+                    <span className="text-xl mr-2">←</span> Back
+                  </button>
+                  <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent flex items-center min-w-0">
+                    <CapgeminiLogo className="mr-3 flex-shrink-0" width="32" height="30" />
+                    <span className="truncate">{selectedModule.title}</span>
+                  </div>
                 </div>
                 
-                <div className="flex items-center space-x-3 flex-shrink-0 absolute right-0">
+                <div className="flex items-center space-x-3 flex-shrink-0">
                   {/* Clear Search Highlights */}
                   {searchHighlight && (
                     <button
