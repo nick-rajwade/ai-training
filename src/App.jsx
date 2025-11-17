@@ -97,21 +97,41 @@ function App() {
       const searchResult = sessionStorage.getItem('searchResult');
       if (searchResult) {
         try {
-          const { contentId, searchTerm, lineNumber } = JSON.parse(searchResult);
-          setSearchHighlight({ searchTerm, lineNumber });
+          const { type, contentId, searchTerm, lineNumber } = JSON.parse(searchResult);
+          setSearchHighlight({ searchTerm, lineNumber, type });
           
           // Function to find and scroll to element with retry logic
           const findAndScrollToElement = (retryCount = 0) => {
-            // First try to find element by search ID
-            let element = document.getElementById(contentId);
-            
-            // If not found, try to find by data-search-id attribute (for headings)
-            if (!element) {
-              element = document.querySelector(`[data-search-id="${contentId}"]`);
+            let element = null;
+
+            if (type === 'module') {
+              // For module searches, highlight the module title
+              element = document.querySelector('h1'); // The main module title
+            } else if (type === 'topic') {
+              // For topic searches, try to find the specific content or the topic in the overview
+              if (contentId === 'topics-overview') {
+                // Try to find the specific topic first
+                element = document.querySelector(`[data-topic-text*="${searchTerm.toLowerCase()}"]`);
+                if (!element) {
+                  // Fall back to the topics overview section
+                  element = document.getElementById('topics-overview') || document.getElementById('topics-covered');
+                }
+              } else {
+                element = document.getElementById(contentId) || 
+                         document.querySelector(`[data-search-id="${contentId}"]`);
+                // If not found in content, try to find in topics overview
+                if (!element) {
+                  element = document.querySelector(`[data-topic-text*="${searchTerm.toLowerCase()}"]`);
+                }
+              }
+            } else {
+              // For content searches, use the existing logic
+              element = document.getElementById(contentId) || 
+                       document.querySelector(`[data-search-id="${contentId}"]`);
             }
             
             if (element) {
-              const yOffset = -120; // Offset for fixed header
+              const yOffset = type === 'module' ? -80 : -120; // Less offset for module title
               const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
               window.scrollTo({ top: y, behavior: 'smooth' });
               
@@ -182,11 +202,39 @@ function App() {
   }, []);
 
   const handleSearchResult = useCallback((result) => {
-    if (result.type === 'module' || result.type === 'topic') {
+    if (result.type === 'module') {
+      // For module searches, highlight the module title and scroll to top
+      const searchData = {
+        type: 'module',
+        searchTerm: result.title,
+        contentId: 'module-title', // Special ID for module title
+        lineNumber: 0
+      };
+      sessionStorage.setItem('searchResult', JSON.stringify(searchData));
+      handleModuleClick(result.moduleId);
+    } else if (result.type === 'topic') {
+      // For topic searches, find and highlight the topic in the content
+      const module = trainingContent.find(m => m.id === result.moduleId);
+      if (module) {
+        // Try to find the topic in the content
+        const contentLines = module.content.split('\n');
+        const topicLineIndex = contentLines.findIndex(line => 
+          line.toLowerCase().includes(result.title.toLowerCase())
+        );
+        
+        const searchData = {
+          type: 'topic',
+          searchTerm: result.title,
+          contentId: topicLineIndex !== -1 ? `search-result-${result.moduleId}-${topicLineIndex}` : 'topics-overview',
+          lineNumber: topicLineIndex !== -1 ? topicLineIndex : 0
+        };
+        sessionStorage.setItem('searchResult', JSON.stringify(searchData));
+      }
       handleModuleClick(result.moduleId);
     } else if (result.type === 'content') {
       // Store search result data for scrolling and highlighting
       const searchData = {
+        type: 'content',
         contentId: result.contentId,
         searchTerm: result.searchTerm,
         lineNumber: result.lineNumber
@@ -375,6 +423,15 @@ function App() {
     return processedLines.join('');
   };
   
+  const applySearchHighlighting = (text, forceHighlight = false) => {
+    if (searchHighlight && searchHighlight.searchTerm && 
+        (forceHighlight || text.toLowerCase().includes(searchHighlight.searchTerm.toLowerCase()))) {
+      const regex = new RegExp(`(${searchHighlight.searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return text.replace(regex, '<mark class="bg-yellow-300 px-1 rounded font-semibold">$1</mark>');
+    }
+    return text;
+  };
+
   const processInlineFormatting = (text) => {
     // Handle LaTeX math expressions first (before other formatting)
     // Handle display math expressions ($$...$$)
@@ -404,11 +461,8 @@ function App() {
     // Handle inline code
     text = text.replace(/`([^`]+)`/g, '<code class="bg-[#F0F8FC] px-3 py-1 rounded-md text-sm font-mono border border-[#E8F4F9] text-[#0070AD]">$1</code>');
     
-    // Apply search highlighting if we have a search term
-    if (searchHighlight && searchHighlight.searchTerm && text.toLowerCase().includes(searchHighlight.searchTerm.toLowerCase())) {
-      const regex = new RegExp(`(${searchHighlight.searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      text = text.replace(regex, '<mark class="bg-yellow-300 px-1 rounded font-semibold">$1</mark>');
-    }
+    // Apply search highlighting
+    text = applySearchHighlighting(text);
     
     return text;
   };
@@ -643,7 +697,12 @@ function App() {
                   </button>
                   <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent flex items-center min-w-0">
                     <CapgeminiLogo className="mr-3 flex-shrink-0" width="32" height="30" />
-                    <span className="truncate">{selectedModule.title}</span>
+                    <span 
+                      className="truncate"
+                      dangerouslySetInnerHTML={{
+                        __html: applySearchHighlighting(selectedModule.title, searchHighlight && searchHighlight.type === 'module')
+                      }}
+                    />
                   </div>
                 </div>
                 
@@ -708,9 +767,12 @@ function App() {
                   <div className="flex items-center mb-4">
                     <CapgeminiLogo className="mr-4" width="60" height="56" />
                     <div>
-                      <h1 className="text-4xl font-bold bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent mb-2">
-                        {selectedModule.title}
-                      </h1>
+                      <h1 
+                        className="text-4xl font-bold bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent mb-2"
+                        dangerouslySetInnerHTML={{
+                          __html: applySearchHighlighting(selectedModule.title, searchHighlight && searchHighlight.type === 'module')
+                        }}
+                      />
                       <p className="text-xl text-gray-700 mb-4 font-medium">{selectedModule.subtitle}</p>
                     </div>
                   </div>
@@ -720,15 +782,20 @@ function App() {
                 </div>
 
                 {/* Topics Overview */}
-                <div className="mb-10 bg-gradient-to-br from-[#F0F8FC] to-white rounded-lg p-6 border border-[#E8F4F9]">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <div id="topics-overview" className="mb-10 bg-gradient-to-br from-[#F0F8FC] to-white rounded-lg p-6 border border-[#E8F4F9]">
+                  <h2 id="topics-covered" className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                     <span className="text-[#0070AD] mr-3">📋</span> Topics Covered
                   </h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     {selectedModule.topics.map((topic, index) => (
-                      <div key={index} className="flex items-start p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
+                      <div key={index} id={`topic-${index}`} data-topic-text={topic.toLowerCase()} className="flex items-start p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
                         <div className="text-[#0070AD] mr-3 mt-0.5 font-bold">✓</div>
-                        <div className="text-gray-800 font-medium">{topic}</div>
+                        <div 
+                          className="text-gray-800 font-medium"
+                          dangerouslySetInnerHTML={{
+                            __html: applySearchHighlighting(topic, searchHighlight && searchHighlight.type === 'topic')
+                          }}
+                        />
                       </div>
                     ))}
                   </div>
