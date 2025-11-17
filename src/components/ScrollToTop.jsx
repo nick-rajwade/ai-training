@@ -49,9 +49,6 @@ const ScrollToTop = () => {
               d="M5 10l7-7m0 0l7 7m-7-7v18"
             />
           </svg>
-          <span className="absolute bottom-full right-0 mb-2 px-4 py-2 bg-[#12239E] text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg font-semibold">
-            ↑ Back to top
-          </span>
         </button>
       )}
     </>
