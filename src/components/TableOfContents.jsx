@@ -47,22 +47,31 @@ const TableOfContents = ({ content }) => {
     // Observe which heading is currently in view
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
+        // Find the entry that is most visible
+        const visibleEntries = entries.filter(entry => entry.isIntersecting);
+        if (visibleEntries.length > 0) {
+          // Get the heading that's most visible (closest to top of viewport)
+          const topMostEntry = visibleEntries.reduce((closest, entry) => {
+            return entry.boundingClientRect.top < closest.boundingClientRect.top ? entry : closest;
+          });
+          setActiveId(topMostEntry.target.id);
+        }
       },
       {
-        rootMargin: '-100px 0px -80% 0px'
+        rootMargin: '-120px 0px -70% 0px', // Adjusted for better detection
+        threshold: [0, 0.1, 0.5, 1.0] // Multiple thresholds for better accuracy
       }
     );
 
-    // Observe all heading elements
-    const headingElements = document.querySelectorAll('h1, h2, h3, h4');
-    headingElements.forEach((element) => observer.observe(element));
+    // Wait a bit for content to render, then observe heading elements
+    const timer = setTimeout(() => {
+      const headingElements = document.querySelectorAll('h1[id^="heading-"], h2[id^="heading-"], h3[id^="heading-"], h4[id^="heading-"]');
+      headingElements.forEach((element) => observer.observe(element));
+    }, 100);
 
     return () => {
+      clearTimeout(timer);
+      const headingElements = document.querySelectorAll('h1[id^="heading-"], h2[id^="heading-"], h3[id^="heading-"], h4[id^="heading-"]');
       headingElements.forEach((element) => observer.unobserve(element));
     };
   }, [headings]);
@@ -70,9 +79,12 @@ const TableOfContents = ({ content }) => {
   const scrollToHeading = (headingId) => {
     const element = document.getElementById(headingId);
     if (element) {
-      const yOffset = -100; // Offset for fixed header
+      const yOffset = -120; // Offset for fixed header and some padding
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
+      
+      // Update active section immediately for better UX
+      setActiveId(headingId);
     }
   };
 

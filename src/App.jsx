@@ -102,13 +102,19 @@ function App() {
           
           // Function to find and scroll to element with retry logic
           const findAndScrollToElement = (retryCount = 0) => {
-            const element = document.getElementById(contentId);
+            // First try to find element by search ID
+            let element = document.getElementById(contentId);
+            
+            // If not found, try to find by data-search-id attribute (for headings)
+            if (!element) {
+              element = document.querySelector(`[data-search-id="${contentId}"]`);
+            }
             
             if (element) {
-              element.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'center' 
-              });
+              const yOffset = -120; // Offset for fixed header
+              const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: y, behavior: 'smooth' });
+              
               // Add a pulsing highlight effect
               element.classList.add('search-highlight-pulse');
               setTimeout(() => {
@@ -286,26 +292,30 @@ function App() {
       // Handle headers with IDs for table of contents
       if (line.startsWith('# ')) {
         const headingText = line.substring(2);
-        const contentId = `search-result-${selectedModule?.id}-${i}`;
-        processedLines.push(`<h1 id="${contentId}" class="text-4xl font-bold mt-10 mb-6 bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent border-b-4 border-[#0070AD] pb-3">${headingText}</h1>`);
+        const headingId = `heading-${i}`;
+        const searchId = `search-result-${selectedModule?.id}-${i}`;
+        processedLines.push(`<h1 id="${headingId}" data-search-id="${searchId}" class="text-4xl font-bold mt-10 mb-6 bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent border-b-4 border-[#0070AD] pb-3">${headingText}</h1>`);
         continue;
       }
       if (line.startsWith('## ')) {
         const headingText = line.substring(3);
-        const contentId = `search-result-${selectedModule?.id}-${i}`;
-        processedLines.push(`<h2 id="${contentId}" class="text-3xl font-bold mt-8 mb-5 text-[#0070AD] border-l-4 border-[#0070AD] pl-4">${headingText}</h2>`);
+        const headingId = `heading-${i}`;
+        const searchId = `search-result-${selectedModule?.id}-${i}`;
+        processedLines.push(`<h2 id="${headingId}" data-search-id="${searchId}" class="text-3xl font-bold mt-8 mb-5 text-[#0070AD] border-l-4 border-[#0070AD] pl-4">${headingText}</h2>`);
         continue;
       }
       if (line.startsWith('### ')) {
         const headingText = line.substring(4);
-        const contentId = `search-result-${selectedModule?.id}-${i}`;
-        processedLines.push(`<h3 id="${contentId}" class="text-2xl font-semibold mt-6 mb-4 text-[#00A1DE]">${headingText}</h3>`);
+        const headingId = `heading-${i}`;
+        const searchId = `search-result-${selectedModule?.id}-${i}`;
+        processedLines.push(`<h3 id="${headingId}" data-search-id="${searchId}" class="text-2xl font-semibold mt-6 mb-4 text-[#00A1DE]">${headingText}</h3>`);
         continue;
       }
       if (line.startsWith('#### ')) {
         const headingText = line.substring(5);
-        const contentId = `search-result-${selectedModule?.id}-${i}`;
-        processedLines.push(`<h4 id="${contentId}" class="text-xl font-semibold mt-5 mb-3 text-gray-800">${headingText}</h4>`);
+        const headingId = `heading-${i}`;
+        const searchId = `search-result-${selectedModule?.id}-${i}`;
+        processedLines.push(`<h4 id="${headingId}" data-search-id="${searchId}" class="text-xl font-semibold mt-5 mb-3 text-gray-800">${headingText}</h4>`);
         continue;
       }
       
@@ -409,12 +419,12 @@ function App() {
       {showHeader && (
         <header className="bg-white shadow-md border-b-2 border-[#0070AD] fixed top-0 left-0 right-0 z-50 transform transition-transform duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-4">
-              <div className="flex items-center text-2xl font-bold bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent">
+            <div className="flex justify-center items-center py-4 relative">
+              <div className="flex items-center text-2xl font-bold bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent justify-center">
                 <CapgeminiLogo className="mr-3" width="32" height="30" />
                 AI Training Platform
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 absolute right-0">
                 <button
                   onClick={() => setIsSearchOpen(true)}
                   className="p-3 rounded-lg transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#0070AD] focus:ring-offset-2 hover:bg-gray-100"
@@ -622,22 +632,20 @@ function App() {
           {/* Header */}
           <header className="bg-white shadow-md border-b-2 border-[#0070AD] sticky top-0 z-40">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center py-6">
-                <div className="flex items-center flex-1 min-w-0">
-                  <button
-                    onClick={handleBackToOverview}
-                    className="text-[#0070AD] hover:text-[#005A8C] mr-6 flex items-center font-semibold transition-colors duration-300 hover:scale-105 flex-shrink-0"
-                    title="Back to Overview (Esc)"
-                  >
-                    <span className="text-xl mr-2">←</span> Back
-                  </button>
-                  <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent flex items-center min-w-0">
-                    <CapgeminiLogo className="mr-3 flex-shrink-0" width="32" height="30" />
-                    <span className="truncate">{selectedModule.title}</span>
-                  </div>
+              <div className="flex justify-center items-center py-6 relative">
+                <button
+                  onClick={handleBackToOverview}
+                  className="text-[#0070AD] hover:text-[#005A8C] flex items-center font-semibold transition-colors duration-300 hover:scale-105 flex-shrink-0 absolute left-0"
+                  title="Back to Overview (Esc)"
+                >
+                  <span className="text-xl mr-2">←</span> Back
+                </button>
+                <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#0070AD] to-[#12239E] bg-clip-text text-transparent flex items-center justify-center">
+                  <CapgeminiLogo className="mr-3 flex-shrink-0" width="32" height="30" />
+                  <span className="truncate">{selectedModule.title}</span>
                 </div>
                 
-                <div className="flex items-center space-x-3 flex-shrink-0">
+                <div className="flex items-center space-x-3 flex-shrink-0 absolute right-0">
                   {/* Clear Search Highlights */}
                   {searchHighlight && (
                     <button
