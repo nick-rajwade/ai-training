@@ -101,6 +101,7 @@ An interactive platform equipping consultants with practical AI knowledge to con
 <div align="center">
   <img src="Capgemini_Spade_2Colors_RGB.svg" alt="Capgemini Logo" width="200">
   
+  
   **🚀 Ready to Lead AI Transformation?**
   
   *Start your AI learning journey today and become the consultant clients turn to for AI strategy and implementation.*
