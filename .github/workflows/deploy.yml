@@ -45,28 +45,38 @@ jobs:
       - name: Add .nojekyll file
         run: touch ./dist/.nojekyll
 
-      - name: Debug - List dist contents
-        run: |
-          echo "Contents of dist folder:"
-          ls -la ./dist/
-          echo ""
-          echo "Contents of dist/assets folder:"
-          ls -la ./dist/assets/ | head -20
-          echo ""
-          echo "Contents of dist/index.html:"
-          cat ./dist/index.html
-          echo ""
-          echo "Checking .nojekyll:"
-          ls -la ./dist/.nojekyll
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
+
+      - name: Verify dist structure before upload
+        run: |
+          echo "=== Complete dist structure ==="
+          find dist -type f | sort
+          echo ""
+          echo "=== File count ==="
+          find dist -type f | wc -l
+          echo ""
+          echo "=== Checking critical files ==="
+          test -f dist/index.html && echo "✓ index.html exists" || echo "✗ index.html missing"
+          test -f dist/.nojekyll && echo "✓ .nojekyll exists" || echo "✗ .nojekyll missing"
+          test -d dist/assets && echo "✓ assets directory exists" || echo "✗ assets directory missing"
+          test -f dist/assets/index-BlZJS3Da.js && echo "✓ JS file exists" || echo "✗ JS file missing"
+          test -f dist/assets/index-Cdh5JmcN.css && echo "✓ CSS file exists" || echo "✗ CSS file missing"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+          retention-days: 1
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        
+      - name: Output deployment URL
+        run: |
+          echo "Deployment URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "Please wait 1-2 minutes for propagation, then try:"
+          echo "  - ${{ steps.deployment.outputs.page_url }}"
+          echo "  - ${{ steps.deployment.outputs.page_url }}assets/index-BlZJS3Da.js"
+          echo "  - ${{ steps.deployment.outputs.page_url }}assets/index-Cdh5JmcN.css"
