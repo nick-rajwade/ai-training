@@ -1,18 +1,6 @@
-# Capgemini A## ✨ Key Features
+# Capgemini AI Traini## 📚 Learning Journey (8## 🎯 Built for Consulta*Immediate Value:** Client-ready insights, business case templates, and risk frameworks you can use today.
 
-- **Business-f## 🎯 Built for Consulta## 📊 Your ROI
-
-**Immediate Impact:** Confidence in AI discussions, practical frameworks, and ready-to-use business cases.
-
-**Career Growth:** Recognized AI expertise, thought leadership opportunities, and future-ready skills.*Immediate Value:** Client-ready insights, business case templates, and risk frameworks you can use today.
-
-**Flexible Learning:** Mobile-friendly, self-paced modules that fit your project schedule.t** with real client scenarios and ROI frameworks
-- **Mobile-friendly** learning for busy consultants
-- **Quick search** and bookmarking for client meeting prep
-- **Progress tracking** to demonstrate AI expertise
-- **Industry case studies** across finance, healthcare, manufacturing, and retailtform
-
-*Master AI for business transformation and client success*
+**Flexible Learning:** Mobile-friendly, self-paced modules that fit your project schedule. AI for business transformation and client success*
 
 An interactive platform equipping consultants with practical AI knowledge to confidently advise clients, identify opportunities, and lead AI transformations.
 
@@ -22,6 +10,14 @@ An interactive platform equipping consultants with practical AI knowledge to con
 - **Identify AI opportunities** that drive measurable business value
 - **Navigate AI risks** and implement governance frameworks
 - **Build compelling business cases** for AI investments
+
+## ✨ Key Features
+
+- **Business-focused content** with real client scenarios and ROI frameworks
+- **Mobile-friendly** learning for busy consultants
+- **Quick search** and bookmarking for client meeting prep
+- **Progress tracking** to demonstrate AI expertise
+- **Industry case studies** across finance, healthcare, manufacturing, and retail
 
 ## ✨ What Makes This Different
 
@@ -105,5 +101,5 @@ An interactive platform equipping consultants with practical AI knowledge to con
   
   *Start your AI learning journey today and become the consultant clients turn to for AI strategy and implementation.*
   
-  **[Access the Platform](#) | [Contact AI CoE](#) | [Share Feedback](#)**
+  **[Access the Platform](https://capgemini-innersource.github.io/ai-training/) | [Contact AI CoE](#) | [Share Feedback](#)**
 </div>
