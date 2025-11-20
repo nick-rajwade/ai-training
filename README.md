@@ -1,4 +1,8 @@
-# Capgemini AI Traini## 📚 Learning Journey (8## 🎯 Built for Consulta*Immediate Value:** Client-ready insights, business case templates, and risk frameworks you can use today.
+# Capgemini AI Traini## 📚 Learning Journey (8## 🎯 Built for Consulta## 📊 Your ROI
+
+**Immediate Impact:** Confidence in AI discussions, practical frameworks, and ready-to-use business cases.
+
+**Career Growth:** Recognized AI expertise, thought leadership opportunities, and future-ready skills.*Immediate Value:** Client-ready insights, business case templates, and risk frameworks you can use today.
 
 **Flexible Learning:** Mobile-friendly, self-paced modules that fit your project schedule. AI for business transformation and client success*
 
