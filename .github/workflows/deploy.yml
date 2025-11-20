@@ -38,10 +38,18 @@ jobs:
         run: pnpm run build
         env:
           NODE_ENV: production
-          BASE_URL: /ai-training/
 
       - name: Add .nojekyll file
         run: touch ./dist/.nojekyll
+
+      - name: Debug - List dist contents
+        run: |
+          echo "Contents of dist folder:"
+          ls -la ./dist/
+          echo "Contents of dist/assets folder:"
+          ls -la ./dist/assets/ | head -20
+          echo "Contents of dist/index.html:"
+          cat ./dist/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
