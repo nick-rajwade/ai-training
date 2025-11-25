@@ -46,24 +46,6 @@ jobs:
         run: touch ./dist/.nojekyll
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Verify dist structure before upload
-        run: |
-          echo "=== Complete dist structure ==="
-          find dist -type f | sort
-          echo ""
-          echo "=== File count ==="
-          find dist -type f | wc -l
-          echo ""
-          echo "=== Checking critical files ==="
-          test -f dist/index.html && echo "✓ index.html exists" || echo "✗ index.html missing"
-          test -f dist/.nojekyll && echo "✓ .nojekyll exists" || echo "✗ .nojekyll missing"
-          test -d dist/assets && echo "✓ assets directory exists" || echo "✗ assets directory missing"
-          ls dist/assets/index-*.js >/dev/null 2>&1 && echo "✓ JS file exists" || echo "✗ JS file missing"
-          ls dist/assets/index-*.css >/dev/null 2>&1 && echo "✓ CSS file exists" || echo "✗ CSS file missing"
-
-      - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
