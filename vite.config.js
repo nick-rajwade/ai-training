@@ -14,7 +14,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: '/',
+  base: '/ai-training/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

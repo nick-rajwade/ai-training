@@ -77,7 +77,7 @@ jobs:
         
       - name: Output deployment URL
         run: |
-          echo "🚀 Deployment URL: https://nick-rajwade.github.io/"
+          echo "🚀 Deployment URL: https://nick-rajwade.github.io/ai-training/"
           echo ""
           echo "⏳ Please wait 1-2 minutes for propagation"
           echo ""
