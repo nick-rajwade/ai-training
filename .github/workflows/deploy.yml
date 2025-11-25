@@ -6,15 +6,20 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,12 +63,17 @@ jobs:
           ls dist/assets/index-*.js >/dev/null 2>&1 && echo "✓ JS file exists" || echo "✗ JS file missing"
           ls dist/assets/index-*.css >/dev/null 2>&1 && echo "✓ CSS file exists" || echo "✗ CSS file missing"
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          force_orphan: true
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
         
       - name: Output deployment URL
         run: |
@@ -74,5 +84,3 @@ jobs:
           echo "🔄 If you see 404 errors for CSS/JS files:"
           echo "  1. Do a hard refresh: Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)"
           echo "  2. Or clear browser cache manually"
-          echo ""
-          echo "📋 Deployed to gh-pages branch"
