@@ -42,8 +42,10 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Add .nojekyll file
-        run: touch ./dist/.nojekyll
+      - name: Add .nojekyll and CNAME files
+        run: |
+          touch ./dist/.nojekyll
+          cp CNAME ./dist/CNAME 2>/dev/null || echo "CNAME already copied by Vite"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -59,9 +61,13 @@ jobs:
           echo "=== Checking critical files ==="
           test -f dist/index.html && echo "✓ index.html exists" || echo "✗ index.html missing"
           test -f dist/.nojekyll && echo "✓ .nojekyll exists" || echo "✗ .nojekyll missing"
+          test -f dist/CNAME && echo "✓ CNAME exists" || echo "✗ CNAME missing"
           test -d dist/assets && echo "✓ assets directory exists" || echo "✗ assets directory missing"
           ls dist/assets/index-*.js >/dev/null 2>&1 && echo "✓ JS file exists" || echo "✗ JS file missing"
           ls dist/assets/index-*.css >/dev/null 2>&1 && echo "✓ CSS file exists" || echo "✗ CSS file missing"
+          echo ""
+          echo "=== CNAME content ==="
+          cat dist/CNAME || echo "CNAME not found"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -75,6 +81,19 @@ jobs:
         
       - name: Output deployment URL
         run: |
-          echo "Deployment URL: ${{ steps.deployment.outputs.page_url }}"
-          echo "Please wait 1-2 minutes for propagation"
-          echo "Custom domain: https://aitraining.onanytopic.com"
+          echo "🚀 Deployment URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "🌐 Custom domain: https://aitraining.onanytopic.com"
+          echo ""
+          echo "⏳ Please wait 1-2 minutes for propagation"
+          echo ""
+          echo "🔄 If you see 404 errors for CSS/JS files:"
+          echo "  1. Visit: https://aitraining.onanytopic.com/clear-cache.html"
+          echo "  2. Or do a hard refresh: Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)"
+          echo "  3. Or clear browser cache manually"
+          echo ""
+          echo "📋 Deployed files:"
+          echo "  - index.html"
+          echo "  - CNAME (custom domain)"
+          echo "  - .nojekyll (GitHub Pages config)"
+          echo "  - $(ls dist/assets/*.js | wc -l) JavaScript file(s)"
+          echo "  - $(ls dist/assets/*.css | wc -l) CSS file(s)"
