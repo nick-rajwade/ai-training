@@ -6,9 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: "pages"
@@ -17,9 +15,6 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,29 +58,21 @@ jobs:
           ls dist/assets/index-*.js >/dev/null 2>&1 && echo "✓ JS file exists" || echo "✗ JS file missing"
           ls dist/assets/index-*.css >/dev/null 2>&1 && echo "✓ CSS file exists" || echo "✗ CSS file missing"
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-          retention-days: 1
-
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          force_orphan: true
         
       - name: Output deployment URL
         run: |
-          echo "🚀 Deployment URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "🚀 Deployment URL: https://nick-rajwade.github.io/ai-training/"
           echo ""
           echo "⏳ Please wait 1-2 minutes for propagation"
           echo ""
           echo "🔄 If you see 404 errors for CSS/JS files:"
-          echo "  1. Visit: https://nick-rajwade.github.io/ai-training/clear-cache.html"
-          echo "  2. Or do a hard refresh: Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)"
-          echo "  3. Or clear browser cache manually"
+          echo "  1. Do a hard refresh: Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)"
+          echo "  2. Or clear browser cache manually"
           echo ""
-          echo "📋 Deployed files:"
-          echo "  - index.html"
-          echo "  - .nojekyll (GitHub Pages config)"
-          echo "  - $(ls dist/assets/*.js | wc -l) JavaScript file(s)"
-          echo "  - $(ls dist/assets/*.css | wc -l) CSS file(s)"
+          echo "📋 Deployed to gh-pages branch"
